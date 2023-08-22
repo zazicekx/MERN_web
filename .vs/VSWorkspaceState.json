@@ -5,8 +5,10 @@
     "\\backend\\config",
     "\\backend\\controllers",
     "\\backend\\middleware",
-    "\\backend\\routes"
+    "\\backend\\models",
+    "\\backend\\routes",
+    "\\backend\\utils"
   ],
-  "SelectedNode": "\\backend\\config\\db.js",
+  "SelectedNode": "\\package.json",
   "PreviewInSolutionExplorer": false
 }

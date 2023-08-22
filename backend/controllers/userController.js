@@ -6,7 +6,21 @@ import generateToken from "../utils/generateToken.js"
 // route    POST /api/users/auth
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
-    res.status(200).json({message: "Auth User"})
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (user && (await user.matchPassword(password))) {
+        generateToken(res, user._id)
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email
+        });
+    } else {
+        res.status(400);
+        throw new Error(`invalid email or password`)
+    }
 });
 
 // @desc    Register new user
@@ -47,21 +61,52 @@ const registerUser = asyncHandler(async (req, res) => {
 // route    POST /api/users/logout
 // @access  Public
 const logoutUser = asyncHandler(async (req, res) => {
-    res.status(200).json({message: "Logout user"})
+    res.cookie("jwt", "", {
+        httpOnly: true,
+        expires: new Date(0)
+    })
+
+    res.status(200).json({message: "User logout user"})
 });
 
 // @desc    Get User profile
 // route    GET /api/users/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-    res.status(200).json({message: "User profile"})
+    const user = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+
+    }
+    res.status(200).json(user)
 });
 
 // @desc    Update user profile
 // route    PUT /api/users/profile
 // @access  Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-    res.status(200).json({message: "Auth User"})
+    const user = await User.findById(req.user._id)
+
+    if (user) {
+        user.name = req.body.name 
+        user.email = req.body.email
+
+        if (req.body.password) {
+            user.password = req.body.password
+        }
+
+        const updateUser = await user.save();
+
+        res.status(200).json({
+            _id: updateduser._id,
+            name: updateduser.name,
+            email: updateduser.email,
+        })
+    } else {
+        res.status(400);
+        throw new Error(`invalid user data`)
+    }
 });
 
 export{
